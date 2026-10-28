@@ -1,0 +1,11 @@
+Lively Eyes and Lively Eyes Bridge
+Copyright (c) 2026 Tokid. All rights reserved.
+
+You may download these files and use them in your own game. No other
+permission is granted: do not reupload, redistribute, or publish modified
+versions of these files, in whole or in part, without written permission
+from the author.
+
+Lively Eyes contains no files from Fresh Moves or Fresh Animations. To be
+compatible with them, it reads the eye-slot pixel layout of skins made for
+Fresh Moves and a few head variables of Fresh Animations' player model.

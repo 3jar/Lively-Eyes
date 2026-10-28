@@ -1,0 +1,13 @@
+# build output
+dist/
+__pycache__/
+.DS_Store
+
+# personal skins used for testing
+test-skins/
+
+# raw screen recordings (the GIFs made from them are kept)
+art/*.mov
+
+# personal notes (release checklist, demo plan, design notes)
+docs/
