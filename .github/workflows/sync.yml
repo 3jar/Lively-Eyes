@@ -1,0 +1,35 @@
+# Applies project.toml and README.md to this repository's GitHub settings and
+# to the Modrinth project (see src/lively_eyes/sync.py).
+name: Sync GitHub and Modrinth
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+      - project.toml
+      - "art/**"
+      - src/lively_eyes/sync.py
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only list what would change
+        type: boolean
+        default: false
+
+concurrency: sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Sync
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          GH_REPO_TOKEN: ${{ secrets.GH_REPO_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          PYTHONPATH: src
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then set -- --dry-run; fi
+          python3 -m lively_eyes.sync "$@"

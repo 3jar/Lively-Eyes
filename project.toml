@@ -1,0 +1,13 @@
+# What GitHub and Modrinth show for Lively Eyes, besides README.md.
+# Edit it and push to main; .github/workflows/sync.yml applies it to both
+# (see src/lively_eyes/sync.py). A field left out is left alone on both sites.
+
+summary = "Reactive eyes for player models. Works with Fresh Animations and Fresh Moves skins."
+icon = "art/icon-modrinth.png"
+
+[github]
+repo = "3jar/Lively-Eyes"
+
+[modrinth]
+id = "fl6UhkVu"
+type = "resourcepack"
