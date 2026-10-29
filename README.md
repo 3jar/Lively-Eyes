@@ -57,7 +57,7 @@ Stand still and your character's eyes wander around. Leave them alone long enoug
 
 ## 📦 Requirements
 
-- Minecraft 26.1 – 26.1.2
+- Minecraft 1.21.11, or 26.1 – 26.1.2
 - [Entity Model Features](https://modrinth.com/mod/entitymodelfeatures) and [Entity Texture Features](https://modrinth.com/mod/entitytexturefeatures)
 - For the eye animations, a skin made for **Fresh Moves** (its eye-slot layout). Head reactions work with any skin.
 

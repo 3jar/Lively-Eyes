@@ -10,7 +10,7 @@ sys.path[:0] = [str(ROOT / "src"), str(ROOT / "tests")]
 
 from emf_expr import Compiled  # noqa: E402
 from lively_eyes import anim, build  # noqa: E402
-from lively_eyes.config import AUTHOR, PREFIX, RESOURCE_FORMAT  # noqa: E402
+from lively_eyes.config import AUTHOR, MAX_FORMAT, MIN_FORMAT, PREFIX  # noqa: E402
 from sim import INPUT_NAMES  # noqa: E402
 
 CEM = "assets/minecraft/emf/cem"
@@ -34,7 +34,8 @@ class StructureTest(unittest.TestCase):
 
     def test_release_metadata(self):
         pack = json.loads(self.files["pack.mcmeta"])["pack"]
-        self.assertEqual((pack["min_format"], pack["max_format"]), (RESOURCE_FORMAT, RESOURCE_FORMAT))
+        self.assertEqual((pack["min_format"], pack["max_format"]), (MIN_FORMAT, MAX_FORMAT))
+        self.assertTrue(MIN_FORMAT <= pack["pack_format"] <= MAX_FORMAT)
         self.assertTrue(self.files["pack.png"].startswith(b"\x89PNG"))
         self.assertIn("All rights reserved", self.files["LICENSE.txt"])
         self.assertIn(AUTHOR, self.files["CREDITS.txt"])

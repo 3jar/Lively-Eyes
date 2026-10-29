@@ -14,7 +14,7 @@ import zipfile
 from pathlib import Path
 
 from . import anim, geometry
-from .config import AUTHOR, GAME_VERSIONS, NAME, PREFIX, RESOURCE_FORMAT, VERSION
+from .config import AUTHOR, GAME_VERSIONS, MAX_FORMAT, MIN_FORMAT, NAME, PREFIX, VERSION
 from .expr import to_json_blocks
 from .instance import instance_dir
 
@@ -24,9 +24,9 @@ CREDIT = f"{NAME} {VERSION} by {AUTHOR}"
 
 PACK_MCMETA = {
     "pack": {
-        "pack_format": RESOURCE_FORMAT,
-        "min_format": RESOURCE_FORMAT,
-        "max_format": RESOURCE_FORMAT,
+        "pack_format": MIN_FORMAT,
+        "min_format": MIN_FORMAT,
+        "max_format": MAX_FORMAT,
         "description": f"§b{NAME} §7{VERSION} · {AUTHOR}\n§7Reactive eyes · Fresh Animations compatible",
     }
 }

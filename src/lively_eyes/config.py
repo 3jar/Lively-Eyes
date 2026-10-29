@@ -5,12 +5,14 @@ Tunables are emitted as the first animation block of player_face.jpm
 """
 
 NAME = "Lively Eyes"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 AUTHOR = "Tokid"
 PREFIX = "le_"
-# Tested on Minecraft 26.1.2 with EMF 3.3.11; 26.1 to 26.1.2 share resource pack format 84.
-GAME_VERSIONS = "26.1–26.1.2"
-RESOURCE_FORMAT = 84
+# Tested on Minecraft 26.1.2 with EMF 3.3.11, which also ships for 1.21.11.
+# Resource pack format 75 is 1.21.11, 84 is 26.1 to 26.1.2; the pack declares the range.
+GAME_VERSIONS = "1.21.11, 26.1–26.1.2"
+MIN_FORMAT = 75
+MAX_FORMAT = 84
 
 # Sign of a pupil mover's tx/ty per +1 face column/row. Derived from how CEM
 # inverts x/y; flip here if pupils move the wrong way in game.
