@@ -1,5 +1,7 @@
-# Keeps the Modrinth page in step with README.md: uploads new art/ images to
-# the gallery and sets the description (see src/lively_eyes/modrinth.py).
+# Keeps the Modrinth page in step with this repository: uploads new art/
+# images to the gallery and sets the description (README.md), the summary
+# (the repository's About) and the icon (see src/lively_eyes/modrinth.py).
+# Editing the About doesn't trigger a run; use Run workflow after it.
 name: Modrinth page
 
 on:
@@ -18,9 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Sync README.md and art/ to Modrinth
+      - name: Sync with Modrinth
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           PYTHONPATH: src
         run: |
           if [ -z "$MODRINTH_TOKEN" ]; then

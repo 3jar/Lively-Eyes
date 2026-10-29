@@ -1,17 +1,22 @@
-"""Keep the Modrinth project page in step with README.md.
+"""Keep the Modrinth project page in step with the GitHub repository.
 
   python3 -m lively_eyes.modrinth [--dry-run]
+
+What Modrinth shows comes from here:
+  description   README.md
+  summary       the repository's About description on GitHub
+  icon          art/icon-modrinth.png
 
 README.md shows its images from art/, which GitHub resolves but Modrinth
 doesn't. Modrinth names every uploaded image by its SHA-1, so each art/ file
 has a known address there: in the gallery, or among the images uploaded
 through the description editor. Images in neither place are uploaded to the
-gallery, titled by their alt text, and the description is set to README.md
-with each art/ path swapped for its Modrinth address. The gallery is only
-added to; nothing is removed from it.
+gallery, titled by their alt text, and the description is README.md with each
+art/ path swapped for its Modrinth address. The gallery is only added to;
+nothing is removed from it.
 
 Needs a Modrinth token with PROJECT_READ and PROJECT_WRITE in $MODRINTH_TOKEN.
---dry-run needs none: it uploads nothing and writes the description that
+--dry-run needs none: it changes nothing and writes the description that
 would be set to dist/MODRINTH.md (run with src/ on PYTHONPATH).
 """
 
@@ -30,8 +35,13 @@ PROJECT = Path(__file__).resolve().parents[2]
 PROJECT_ID = "fl6UhkVu"
 API = f"https://api.modrinth.com/v2/project/{PROJECT_ID}"
 CDN = "https://cdn.modrinth.com/data"
-USER_AGENT = "3jar/Lively-Eyes (https://github.com/3jar/Lively-Eyes)"
+GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "3jar/Lively-Eyes")
+USER_AGENT = f"{GITHUB_REPO} (https://github.com/{GITHUB_REPO})"
+ICON = "art/icon-modrinth.png"
 GALLERY_LIMIT = 5 * 1024 * 1024  # bytes per gallery image
+ICON_LIMIT = 256 * 1024  # bytes
+# Modrinth calls the long text "body" and the summary "description"
+FIELDS = {"body": "description", "description": "summary"}
 
 # an art/ path inside ![](...) or src="..."
 ART = re.compile(r'(?<=[("])art/[^)"\s]+')
@@ -83,6 +93,22 @@ def _api(method, query, token, data=None, content_type=None):
         raise SystemExit(f"Modrinth: {method} {query or '/'} failed with {e.code}: {detail}")
 
 
+def about():
+    """The repository's About description on GitHub ("" if it has none)."""
+    request = urllib.request.Request(f"https://api.github.com/repos/{GITHUB_REPO}")
+    if os.environ.get("GITHUB_TOKEN"):
+        request.add_header("Authorization", f"Bearer {os.environ['GITHUB_TOKEN']}")
+    with _open(request) as response:
+        return (json.load(response).get("description") or "").strip()
+
+
+def icon():
+    data = (PROJECT / ICON).read_bytes()
+    if len(data) > ICON_LIMIT:
+        raise SystemExit(f"{ICON} is {len(data) / 1024:.0f} KiB; Modrinth takes icons up to 256 KiB")
+    return data
+
+
 def plan(readme):
     """Each art/ image README.md shows -> its Modrinth URL, plus those that still need uploading."""
     urls, uploads = {}, []
@@ -110,7 +136,6 @@ def upload(path, title, token):
 
 def sync(readme, token):
     urls, uploads = plan(readme)
-    body = description(readme, urls)
     alts = alt_texts(readme)
     for path in uploads:
         upload(path, alts.get(path) or Path(path).stem, token)
@@ -121,23 +146,43 @@ def sync(readme, token):
     if lost:
         raise SystemExit(f"uploaded {', '.join(lost)}, but the gallery lists it under another address; "
                          "description left unchanged")
-    if project["body"] == body:
-        print("description already up to date")
+
+    wanted = {"body": description(readme, urls)}
+    summary = about()
+    if summary:
+        wanted["description"] = summary
     else:
-        _api("PATCH", "", token, json.dumps({"body": body}).encode(), "application/json")
-        print("updated description")
+        print("summary: left unchanged, the GitHub repository has no About description")
+    changes = {key: value for key, value in wanted.items() if project.get(key) != value}
+    if changes:
+        _api("PATCH", "", token, json.dumps(changes).encode(), "application/json")
+    for key in wanted:
+        print(f"{FIELDS[key]}: {'updated' if key in changes else 'already up to date'}")
+
+    data = icon()
+    digest = hashlib.sha1(data).hexdigest()
+    # like gallery images, the icon is filed under the SHA-1 of the uploaded file
+    if digest in (project.get("icon_url") or ""):
+        print("icon: already up to date")
+        return
+    _api("PATCH", f"/icon?ext={Path(ICON).suffix[1:]}", token, data, mimetypes.guess_type(ICON)[0])
+    print("icon: updated")
+    if digest not in (json.loads(_api("GET", "", token)).get("icon_url") or ""):
+        print("::warning::Modrinth filed the icon under another name; it will be uploaded again on every run")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dry-run", action="store_true", help="upload nothing; write the description to dist/MODRINTH.md")
+    parser.add_argument("--dry-run", action="store_true", help="change nothing; write the description to dist/MODRINTH.md")
     parser.add_argument("--dist", type=Path, default=PROJECT / "dist")
     args = parser.parse_args()
     readme = (PROJECT / "README.md").read_text()
     if args.dry_run:
         urls, uploads = plan(readme)
+        icon()
         for path in uploads:
             print("would upload", path)
+        print("summary:", about() or "(none, left unchanged)")
         args.dist.mkdir(parents=True, exist_ok=True)
         out = args.dist / "MODRINTH.md"
         out.write_text(description(readme, urls))
