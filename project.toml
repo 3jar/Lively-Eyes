@@ -2,12 +2,30 @@
 # Edit it and push to main; .github/workflows/sync.yml applies it to both
 # (see src/lively_eyes/sync.py). A field left out is left alone on both sites.
 
+name = "Lively Eyes"  # Modrinth title
 summary = "Reactive eyes for player models. Works with Fresh Animations and Fresh Moves skins."
-icon = "art/icon-modrinth.png"
+icon = "art/icon-modrinth.png"  # Modrinth icon, up to 256 KiB
 
 [github]
 repo = "3jar/Lively-Eyes"
+# the About's website is the Modrinth page (modrinth.type and .slug)
+topics = [
+  "minecraft",
+  "minecraft-resource-pack",
+  "entity-model-features",
+  "fresh-animations",
+  "fresh-moves",
+  "player-animation",
+]
 
 [modrinth]
 id = "fl6UhkVu"
 type = "resourcepack"
+slug = "lively-eyes"  # modrinth.com/resourcepack/lively-eyes
+# tags: categories are the featured ones, additional_categories the rest
+categories = ["entities", "models", "tweaks"]
+additional_categories = []
+# links; the source link is always the GitHub repository. "" means none.
+issues = "https://github.com/3jar/Lively-Eyes/issues"
+wiki = ""
+discord = ""

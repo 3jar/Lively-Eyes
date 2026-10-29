@@ -106,8 +106,9 @@ def _same(live, wanted):
 
 
 def _show(value):
-    text = json.dumps(value, ensure_ascii=False)
-    return text if len(text) <= 100 else f"({len(value)} characters)"
+    if isinstance(value, str) and len(value) > 100:
+        return f"({len(value)} characters)"
+    return json.dumps(value, ensure_ascii=False)
 
 
 def diff(site, live, wanted, fields):
