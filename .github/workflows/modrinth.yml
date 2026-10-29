@@ -1,0 +1,30 @@
+# Keeps the Modrinth page in step with README.md: uploads new art/ images to
+# the gallery and sets the description (see src/lively_eyes/modrinth.py).
+name: Modrinth page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+      - "art/**"
+      - src/lively_eyes/modrinth.py
+  workflow_dispatch:
+
+concurrency: modrinth
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync README.md and art/ to Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          PYTHONPATH: src
+        run: |
+          if [ -z "$MODRINTH_TOKEN" ]; then
+            echo "::warning::MODRINTH_TOKEN is not set; the Modrinth page was not updated"
+            exit 0
+          fi
+          python3 -m lively_eyes.modrinth
